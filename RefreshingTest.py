@@ -2,11 +2,11 @@ import RefreshingPython
 from RefreshingPython import MakeDrink, MakeOrder
 import unittest
 
-#Done By: Ethan Todd
-#Done On: 04/23/2025
-#Using: Youtube (for testing setup) and ChatGPT (for flavors test logic troubleshooting)
+"""Done By: Ethan Todd
+Done On: 04/23/2025
+Using: Youtube (for testing setup) and ChatGPT (for flavors test logic troubleshooting)
 
-#WHAT IT DOES: It runs two different tests that have a different amount of flavors and makes sure they work
+WHAT IT DOES: It runs two different tests that have a different amount of flavors and makes sure they work"""
 
 class Test_RefreshingPython(unittest.TestCase):
     #tests a drink with two flavors
