@@ -3,7 +3,7 @@ from RefreshingPython import MakeDrink, MakeOrder
 import unittest
 
 """Done By: Ethan Todd
-Done On: 04/23/2025
+Done On: 5/5/2025
 Using: Youtube (for testing setup) and ChatGPT (for flavors test logic troubleshooting)
 
 WHAT IT DOES: It runs two different tests that have a different amount of flavors and makes sure they work"""
@@ -71,7 +71,22 @@ class Test_RefreshingPython(unittest.TestCase):
         self.assertEqual(f"{tax:.2f}", "0.19")
         self.assertEqual(f"{price:.2f}", "2.84")
 
+    #tests a drink with food items and toppings
+    def test_drink_four(self):
+        drink = MakeDrink("Water")
+        food_1 = "Hotdog"
+        food_2 = "Nacho Chips"
+        topping_1 = "Mustard"
+        topping_2 = "Ketchup"
 
+        drink.addFood(food_1)
+        drink.addFood(food_2)
+        drink.addToppings(topping_1)
+        drink.addToppings(topping_2)
+
+        #tests food and toppings
+        self.assertListEqual(sorted(drink.getFood()), sorted(["Hotdog", "Nacho Chips"]), "incorrect food")
+        self.assertListEqual(sorted(drink.getToppings()), sorted(["Mustard", "Ketchup"]), "incorrect topping(s)")
         
         
 if __name__ == "__main__":
