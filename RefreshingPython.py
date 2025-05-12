@@ -282,7 +282,6 @@ if __name__ == "__main__":
     special_drink.addSpecialFlavor(special_flavor)
     special_drink.addSpecialTopping(special_topping)
 
-    # Add flavors, food, and toppings to drink1
     drink1.addFlavors(flavor1_1)
     drink1.addFlavors(flavor1_2)
     drink1.addFlavors(flavor1_3)
@@ -292,7 +291,6 @@ if __name__ == "__main__":
     drink1.addToppings(topping_1)
     drink1.addToppings(topping_2)
 
-    # Add drinks to the order
     order = MakeOrder()
     order.addItem(drink1)
     order.addItem(special_drink)
