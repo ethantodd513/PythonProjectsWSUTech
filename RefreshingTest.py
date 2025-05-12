@@ -88,6 +88,29 @@ class Test_RefreshingPython(unittest.TestCase):
         self.assertListEqual(sorted(drink.getFood()), sorted(["Hotdog", "Nacho Chips"]), "incorrect food")
         self.assertListEqual(sorted(drink.getToppings()), sorted(["Mustard", "Ketchup"]), "incorrect topping(s)")
         
-        
+    #tests a special drink with one flavor and two toppings
+    def test_drink_five(self):
+        special_drink = MakeDrink(base=None, size="Large", special="Ice Storm")
+        special_flavor = "Mint Chocolate Chip"
+        special_topping = "Cherry"
+        special_topping2 = "Chocolate Sauce"
+
+        special_drink.addSpecialFlavor(special_flavor)
+        special_drink.addSpecialTopping(special_topping)
+        special_drink.addSpecialTopping(special_topping2)
+
+        self.assertEqual(sorted(special_drink.getFlavors()), sorted(["Mint Chocolate Chip"]), "incorrect flavor(s)")
+        self.assertListEqual(sorted(special_drink.getToppings()), sorted(["Cherry", "Chocolate Sauce"]), "incorrect topping(s)")
+
+        order = MakeOrder()
+        order.addItem(special_drink)
+
+        price = special_drink.getPrice()
+        tax = special_drink.getTax()
+
+        self.assertEqual(f"{tax:.2f}", "0.19")
+        self.assertEqual(f"{price:.2f}", "2.84")
+
+
 if __name__ == "__main__":
     unittest.main()

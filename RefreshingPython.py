@@ -1,5 +1,5 @@
 """Made By: Ethan Todd
-Done On: 5/5/2025
+Done On: 5/12/2025
 References/Help: Google searches (finding information), ChatGPT (finding information and fixing bugs),
 peers/online personal help (finding information)
 
@@ -9,6 +9,7 @@ class MakeOrder creates the order and applies the recieved input/data to the ord
 
 class MakeDrink:
     AVAILABLE_BASES = {"Water", "Sbrite", "Pokeacola", "Mr. Salt", "Hill Fog", "Leaf Wine"}
+    AVAILABLE_SPECIALS = {"Ice Storm"}
     AVAILABLE_FLAVORS = {"Lemon", "Cherry", "Strawberry", "Mint", "Blueberry", "Lime"}
     AVAILABLE_SIZES = {"Small", "Medium", "Large", "Mega"}
     AVAILABLE_FOODS = {"Hotdog", "Corndog", "Ice Cream", "Onion Rings", "French Fries", "Tater Tots", "Nacho Chips"}
@@ -38,15 +39,41 @@ class MakeDrink:
         "Large": 2.05,
         "Mega": 2.15
     }
+    SPECIAL_DRINK_FLAVORS = {
+        "Ice Storm": {
+            "Mint Chocolate Chip": 4.00,
+            "Vanilla Bean": 3.00,
+            "Chocolate": 3.00,
+            "Banana": 3.50,
+            "Butter Pecan": 3.50,
+            "S'more": 4.00
+            }
+    }
+    SPECIAL_DRINK_TOPPINGS = {
+        "Ice Storm": {
+            "Cherry": 0.50,
+            "Whipped Cream": 0.50,
+            "Caramel Sauce": 0.00,
+            "Chocolate Sauce": 0.00,
+            "Storeos": 0.50,
+            "Dig Dogs": 0.00,
+            "T&Ts": 0.00,
+            "Cookie Dough": 0.50,
+            "Pecans": 0.50
+        }
+    }
     ADDITIONAL_PRICE_PER_FLAVOR = 0.15
     TAX_RATE = 7.25
 
-    def __init__(self, base=None, size=None):
+    def __init__(self, base=None, size=None, special=None):
         self._base = None
         self._flavors = set()
         self._food = set()
         self._toppings = set()
         self._size = None
+        self._special = None
+        self._special_flavors = set()
+        self._special_toppings = set()
 
         if base:
             self._base = base
@@ -54,14 +81,23 @@ class MakeDrink:
         if size:
             self._size = size
 
+        if special:
+            self.setSpecial(special)
+
     def getBase(self):
         return self._base
     
     def getFlavors(self):
-        return list(self._flavors)
+        if self._special:
+            return list(self._special_flavors)
+        else:
+            return list(self._flavors)
     
     def getToppings(self):
-        return list(self._toppings)
+        if self._special:
+            return list(self._special_toppings)
+        else:
+            return list(self._toppings)
     
     def getFood(self):
         return list(self._food)
@@ -83,8 +119,10 @@ class MakeDrink:
         food_cost = sum(self.FOOD_PRICES.get(food, 0) for food in self._food)
         toppings_cost = sum(self.FOOD_TOPPINGS.get(topping, 0) for topping in self._toppings)
         additional_flavor_cost = max((len(self._flavors) - 1), 0) * self.ADDITIONAL_PRICE_PER_FLAVOR
-        tax = (base_price + additional_flavor_cost + food_cost + toppings_cost) * (self.TAX_RATE / 100)
-        total = base_price + additional_flavor_cost + food_cost + toppings_cost + tax
+        special_flavor_cost = sum(MakeDrink.SPECIAL_DRINK_FLAVORS[self._special].get(flavor, 0) for flavor in self._special_flavors)
+        special_topping_cost = sum(MakeDrink.SPECIAL_DRINK_TOPPINGS[self._special].get(topping, 0) for topping in self._special_toppings)
+        tax = (base_price + additional_flavor_cost + food_cost + toppings_cost + special_flavor_cost + special_topping_cost) * (self.TAX_RATE / 100)
+        total = base_price + additional_flavor_cost + food_cost + toppings_cost + special_flavor_cost + special_topping_cost + tax
         return total
 
     def getTax(self):
@@ -92,7 +130,9 @@ class MakeDrink:
         food_cost = sum(self.FOOD_PRICES.get(food, 0) for food in self._food)
         toppings_cost = sum(self.FOOD_TOPPINGS.get(topping, 0) for topping in self._toppings)
         additional_flavor_cost = max((len(self._flavors) - 1), 0) * self.ADDITIONAL_PRICE_PER_FLAVOR
-        tax = (base_price + additional_flavor_cost + food_cost + toppings_cost) * (self.TAX_RATE / 100)
+        special_flavor_cost = sum(MakeDrink.SPECIAL_DRINK_FLAVORS[self._special].get(flavor, 0) for flavor in self._special_flavors)
+        special_topping_cost = sum(MakeDrink.SPECIAL_DRINK_TOPPINGS[self._special].get(topping, 0) for topping in self._special_toppings)
+        tax = (base_price + additional_flavor_cost + food_cost + toppings_cost + special_flavor_cost + special_topping_cost) * (self.TAX_RATE / 100)
         return tax
     
     def setBase(self, base):
@@ -137,6 +177,25 @@ class MakeDrink:
         if topping in MakeDrink.FOOD_TOPPINGS:
             self._toppings.add(topping)
 
+    def setSpecial(self, special):
+        if special not in MakeDrink.AVAILABLE_SPECIALS:
+            raise ValueError(f"{special} is not a correct option")
+        self._special = special
+
+    def addSpecialFlavor(self, flavor):
+        if not self._special:
+            raise ValueError("No special drink selected")
+        if flavor not in MakeDrink.SPECIAL_DRINK_FLAVORS.get(self._special, {}):
+            raise ValueError(f"{flavor} is not a correct option")
+        self._special_flavors.add(flavor)
+    
+    def addSpecialTopping(self, topping):
+        if not self._special:
+            raise ValueError("No special drink selected")
+        if topping not in MakeDrink.SPECIAL_DRINK_TOPPINGS.get(self._special, {}):
+            raise ValueError(f"{topping} is not a correct option")
+        self._special_toppings.add(topping)
+
 class MakeOrder:
     def __init__(self):
         self._drinks = []
@@ -156,7 +215,9 @@ class MakeOrder:
             self._drinks.pop()
     
     def get_total(self):
-        total = []
+        normal_drinks = []
+        special_drinks = []
+        order_total_price = 0
 
         for i, drink in enumerate(self._drinks):
             base = drink.getBase() or "Invalid Base"
@@ -164,46 +225,77 @@ class MakeOrder:
             size = drink.getSize() or "Invalid Size"
             food = ", ".join(drink.getFood()) if drink.getNumOfFood() > 0 else "None"
             toppings = ", ".join(drink.getToppings()) if drink.getNumOfToppings() > 0 else "None"
+            special_flavors = ", ".join(drink._special_flavors) if drink._special_flavors else "None"
+            special_toppings = ", ".join(drink._special_toppings) if drink._special_toppings else "None"
             price = drink.getPrice()
             tax = drink.getTax()
 
-            """used to test the order"""
-            total.append(f"Drink: {i + 1} | Base: {base}\nFlavor(s): {flavors}\nSize: {size}\nFood: {food}\nTopping(s): {toppings}\nTax: {tax:.2f}\nTotal: {price:.2f}\n--------")
-        return "\n".join(total)
+            if drink._special:
+                special_drinks.append(
+                    f"Special Drink: {i}\n"
+                    f"Special Drink: {drink._special or 'None'}\n"
+                    f"Special Flavors: {special_flavors}\n"
+                    f"Special Toppings: {special_toppings}\n"
+                    f"Tax: {tax:.2f}\n"
+                    f"Total: {price:.2f}\n--------"
+                )
+            else:
+                normal_drinks.append(
+                    f"Drink: {i + 1}\n"
+                    f"Base: {base}\n"
+                    f"Flavor(s): {flavors}\n"
+                    f"Size: {size}\n"
+                    f"Food: {food}\n"
+                    f"Topping(s): {toppings}\n"
+                    f"Tax: {tax:.2f}\n"
+                    f"Total: {price:.2f}\n--------"
+                )
+
+            order_total_price += price
+
+        output = []
+        if normal_drinks:
+            output.append("Normal Drinks:\n" + "\n".join(normal_drinks))
+        if special_drinks:
+            output.append("Special Drinks:\n" + "\n".join(special_drinks))
+        output.append(f"Grand Total: {order_total_price:.2f}")
+
+        return "\n".join(output)
+
+
 
 """test function (lacks front-end so this has to do)"""
 if __name__ == "__main__":
-    drink1 = MakeDrink("Water")
+    drink1 = MakeDrink(base="Water", size="Medium")
     flavor1_1 = "Strawberry"
     flavor1_2 = "Mint"
     flavor1_3 = "Blueberry"
     flavor1_4 = "Lime"
     flavor1_5 = "Lemon"
-    size1 = "Large"
     food_1 = "Hotdog"
     topping_1 = "Mustard"
     topping_2 = "Ketchup"
 
-    drink2 = MakeDrink("Sbrite")
-    flavor2_1 = "Lime"
-    flavor2_2 = "Blueberry"
-    size2 = "Mega"
+    special_drink = MakeDrink(base=None, size="Large", special="Ice Storm")
+    special_flavor = "Mint Chocolate Chip"
+    special_topping = "Cherry"
+    special_drink.addSpecialFlavor(special_flavor)
+    special_drink.addSpecialTopping(special_topping)
 
+    # Add flavors, food, and toppings to drink1
     drink1.addFlavors(flavor1_1)
     drink1.addFlavors(flavor1_2)
     drink1.addFlavors(flavor1_3)
     drink1.addFlavors(flavor1_4)
     drink1.addFlavors(flavor1_5)
-    drink1.addSize(size1)
     drink1.addFood(food_1)
     drink1.addToppings(topping_1)
+    drink1.addToppings(topping_2)
 
-    drink2.addFlavors(flavor2_1)
-    drink2.addFlavors(flavor2_2)
-    drink2.addSize(size2)
-
+    # Add drinks to the order
     order = MakeOrder()
     order.addItem(drink1)
-    order.addItem(drink2)
+    order.addItem(special_drink)
 
     print(order.get_total())
+
